@@ -37,13 +37,22 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Cursor;
+
+import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
+import org.jfree.chart.ChartFactory;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
 import org.jfree.chart.demo.PieChartDemo1;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataItem;
 
 public class Dashboard extends JFrame {
 
-	private JPanel contentPane;
+	private JPanel contentPane, pnlBPTrends;
 	private JTextField txtSearcher;
 	private JTable tblBPBook;
 	
@@ -508,19 +517,12 @@ public class Dashboard extends JFrame {
             System.out.println(e);
             }
         
-        JPanel pnlBPTrends = new JPanel();
+        pnlBPTrends = new JPanel();
         pnlBPTrends.setBounds(0, 294, 320, 199);
         pnlStatistics.add(pnlBPTrends);
         pnlBPTrends.setLayout(null);
         pnlBPTrends.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnlBPTrends.setBackground(Color.WHITE);
-        
-        JLabel lblBPTrends = new JLabel("<html>YOUR BLOOD PRESSURE <br> TRENDS THIS MONTH\r\n");
-        lblBPTrends.setVerticalAlignment(SwingConstants.CENTER);
-        lblBPTrends.setHorizontalAlignment(SwingConstants.CENTER);
-        lblBPTrends.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        lblBPTrends.setBounds(10, 11, 300, 34);
-        pnlBPTrends.add(lblBPTrends);
         
         JPanel pnlBPComparison = new JPanel();
         pnlBPComparison.setBounds(328, 294, 320, 199);
@@ -773,7 +775,46 @@ public class Dashboard extends JFrame {
         		exit.setVisible(true);
         	}
         });
+        generate();
         this.setLocationRelativeTo(null);
         
         }
+	
+	public void generate()
+	{
+		try
+		{
+		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
+		dataset.setValue(120, "", "January");
+		dataset.setValue(105, "", "Febuary");
+		dataset.setValue(100, "", "March");
+		dataset.setValue(65, "", "April");
+		dataset.setValue(60, "", "June");
+		
+		JFreeChart chart = ChartFactory.createLineChart("", "", "", dataset, PlotOrientation.VERTICAL, false, false, false);
+		chart.addSubtitle(new TextTitle("YOUR BLOOD PRESSURE TRENDS THIS MONTH"));
+		
+		
+		CategoryPlot catplot = chart.getCategoryPlot();
+		catplot.setRangeGridlinePaint(Color.BLACK);
+		catplot.setBackgroundPaint(Color.WHITE);
+		
+		ChartPanel chartPanel = new ChartPanel(chart);
+		chartPanel.setForeground(Color.GRAY);
+		chartPanel.setBorder(null);
+		chartPanel.setBackground(Color.YELLOW);
+		
+		LineAndShapeRenderer renderer = (LineAndShapeRenderer) catplot.getRenderer();
+		renderer.setShapesVisible(true);
+		renderer.setDrawOutlines(true);
+		renderer.setFillPaint(Color.BLACK);
+		renderer.setUseFillPaint(true);
+		
+		pnlBPTrends.setLayout(new java.awt.BorderLayout());
+		pnlBPTrends.add(chartPanel);
+		pnlBPTrends.validate();
+		}catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
 }

@@ -13,6 +13,7 @@ import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.renderer.category.LineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.category.DefaultCategoryDataset;
 
@@ -75,13 +76,23 @@ public class jchartExample extends JFrame {
 		
 		JFreeChart chart = ChartFactory.createLineChart("", "", "", dataset, PlotOrientation.VERTICAL, false, false, false);
 		chart.addSubtitle(new TextTitle("YOUR AVERAGE WEEKLY BLOOD PRESSURE THIS MONTH"));
+		
+		
 		CategoryPlot catplot = chart.getCategoryPlot();
 		catplot.setRangeGridlinePaint(Color.BLACK);
+		catplot.setBackgroundPaint(Color.WHITE);
 		
 		ChartPanel chartPanel = new ChartPanel(chart);
 		chartPanel.setForeground(Color.GRAY);
 		chartPanel.setBorder(new LineBorder(new Color(0, 0, 0)));
 		chartPanel.setBackground(Color.YELLOW);
+		
+		LineAndShapeRenderer renderer = (LineAndShapeRenderer) catplot.getRenderer();
+		renderer.setShapesVisible(true);
+		renderer.setDrawOutlines(true);
+		renderer.setFillPaint(Color.BLACK);
+		renderer.setUseFillPaint(true);
+		
 		panel.setLayout(new java.awt.BorderLayout());
 		panel.add(chartPanel);
 		panel.validate();
