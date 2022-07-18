@@ -54,7 +54,7 @@ public class EditRecord extends JFrame {
 	public EditRecord() {
 		setType(Type.UTILITY);
 		setTitle("Edit a Record");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 460, 349);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(5, 5, 5, 5));

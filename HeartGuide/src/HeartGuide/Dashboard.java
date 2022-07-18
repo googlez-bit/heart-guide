@@ -8,6 +8,14 @@ import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.Timer;
+import java.util.TimerTask;
 
 import javax.swing.JLabel;
 import java.awt.Font;
@@ -37,24 +45,34 @@ import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.Cursor;
+import java.awt.Dimension;
 
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.statistics.HistogramDataset;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.axis.NumberAxis;
 import org.jfree.chart.demo.PieChartDemo1;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.PlotOrientation;
+import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.renderer.category.BarRenderer;
 import org.jfree.chart.renderer.category.LineAndShapeRenderer;
+import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.title.TextTitle;
 import org.jfree.data.xy.XYDataItem;
+import org.jfree.data.xy.XYDataset;
+import org.jfree.data.xy.XYSeries;
+import org.jfree.data.xy.XYSeriesCollection;
+import org.jfree.ui.RectangleInsets;
 
 public class Dashboard extends JFrame {
 
-	private JPanel contentPane, pnlBPTrends;
+	private JPanel contentPane, pnlBPTrends, pnlBPComparison;
 	private JTextField txtSearcher;
 	private JTable tblBPBook;
+	private JLabel lblTime, lblDate;
 	
 	/**
 	 * Launch the application.
@@ -524,19 +542,12 @@ public class Dashboard extends JFrame {
         pnlBPTrends.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnlBPTrends.setBackground(Color.WHITE);
         
-        JPanel pnlBPComparison = new JPanel();
+        pnlBPComparison = new JPanel();
         pnlBPComparison.setBounds(328, 294, 320, 199);
         pnlStatistics.add(pnlBPComparison);
         pnlBPComparison.setLayout(null);
         pnlBPComparison.setBorder(new LineBorder(new Color(0, 0, 0)));
         pnlBPComparison.setBackground(Color.WHITE);
-        
-        JLabel lblBPComparison = new JLabel("<html>COMPARISON OF YOUR BLOOD <br>\r\nPRESSURE RECORDS THIS MONTH\r\n\r\n");
-        lblBPComparison.setVerticalAlignment(SwingConstants.CENTER);
-        lblBPComparison.setHorizontalAlignment(SwingConstants.CENTER);
-        lblBPComparison.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        lblBPComparison.setBounds(10, 11, 300, 34);
-        pnlBPComparison.add(lblBPComparison);
         
         //BP Book
         JPanel pnlBPBook = new JPanel();
@@ -711,12 +722,12 @@ public class Dashboard extends JFrame {
         tblBPBook.getColumnModel().getColumn(5).setPreferredWidth(93);
         
         
-        JLabel lblTime = new JLabel("Time: 8:00 PM");
+        lblTime = new JLabel("Time: 8:00 PM");
         lblTime.setBounds(717, 47, 121, 22);
         contentPane.add(lblTime);
         lblTime.setFont(new Font("Tahoma", Font.PLAIN, 14));
         
-        JLabel lblDate = new JLabel("Date: December 31, 2022");
+        lblDate = new JLabel("Date: December 31, 2022");
         lblDate.setBounds(717, 26, 168, 22);
         contentPane.add(lblDate);
         lblDate.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -775,46 +786,138 @@ public class Dashboard extends JFrame {
         		exit.setVisible(true);
         	}
         });
-        generate();
+        getDateTime();
+        XYDataset dataset = createDataset();
+        generateLineChart(dataset);
+        generateBarChart();
         this.setLocationRelativeTo(null);
         
         }
 	
-	public void generate()
+	private static XYDataset createDataset() {
+		XYSeries series1 = new XYSeries("Systolic");
+		
+		series1.add(120, 1);
+		series1.add(120, 2);
+		series1.add(118, 3);
+		series1.add(120, 4);
+		series1.add(119, 5);
+		series1.add(120, 6);
+		series1.add(120, 7);
+		
+		XYSeries series2 = new XYSeries("Diatolic");
+		series2.add(80, 1);
+		series2.add(80, 2);
+		series2.add(80, 3);
+		series2.add(75, 4);
+		series2.add(79, 5);
+		series2.add(78, 6);
+		series2.add(80, 7);
+		
+		XYSeriesCollection dataset = new XYSeriesCollection();
+		dataset.addSeries(series1);
+		dataset.addSeries(series2);
+		return dataset;
+		}
+	
+	public void generateLineChart(XYDataset dataset)
 	{
 		try
 		{
+			JFreeChart chart = ChartFactory.createXYLineChart(
+					"Line Chart Demo 2",      // chart title
+					"Values",                      // x axis label
+					"Weeks",                      // y axis label
+					dataset,                  // data
+					PlotOrientation.HORIZONTAL,
+					true,                     // include legend
+					false,                     // tooltips
+					false                     // urls
+					);
+			chart.setBackgroundPaint(Color.white);
+			XYPlot plot = (XYPlot) chart.getPlot();
+			plot.setBackgroundPaint(Color.WHITE);
+			plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
+			plot.setDomainGridlinePaint(Color.WHITE);
+			plot.setRangeGridlinePaint(Color.BLACK);
+			XYLineAndShapeRenderer renderer= (XYLineAndShapeRenderer) plot.getRenderer();
+			renderer.setShapesVisible(true);
+			renderer.setShapesFilled(true);
+			NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
+			rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
+			
+			
+			ChartPanel chartPanel = new ChartPanel(chart, true);
+			pnlBPTrends.setLayout(new java.awt.BorderLayout());
+			pnlBPTrends.add(chartPanel);
+			pnlBPTrends.validate();
+			
+		}catch(Exception ex) {
+			System.out.println(ex);
+		}
+	}
+	
+	public void getDateTime()
+	{
+		Timer timer = new Timer("Display Timer");
+
+        TimerTask task = new TimerTask() {
+            @Override
+            public void run() {
+            	//display time every second
+                DateFormat timeFormat = new SimpleDateFormat("hh:mm");
+                Calendar cali = Calendar.getInstance();
+                cali.getTime();
+                String time = timeFormat.format(cali.getTimeInMillis());
+                lblTime.setText("Time: " + time);
+                
+              //display date every second
+                DateTimeFormatter dateFormat = DateTimeFormatter.ofPattern("MMMM, dd yyyy"); 
+                LocalDateTime now = LocalDateTime.now();
+                lblDate.setText("Date: " + dateFormat.format(now));
+            }
+        };
+
+        timer.scheduleAtFixedRate(task, 1000, 1000); 
+	}
+	
+	public void generateBarChart() {
 		DefaultCategoryDataset dataset = new DefaultCategoryDataset();
-		dataset.setValue(120, "", "January");
-		dataset.setValue(105, "", "Febuary");
-		dataset.setValue(100, "", "March");
-		dataset.setValue(65, "", "April");
-		dataset.setValue(60, "", "June");
-		
-		JFreeChart chart = ChartFactory.createLineChart("", "", "", dataset, PlotOrientation.VERTICAL, false, false, false);
-		chart.addSubtitle(new TextTitle("YOUR BLOOD PRESSURE TRENDS THIS MONTH"));
-		
+		dataset.addValue(20, "Normal", "N");
+		dataset.addValue(5, "Low", "L");
+		dataset.addValue(4, "Elevated", "E");
+		dataset.addValue(4, "Hypertensive", "H");
+		JFreeChart chart = ChartFactory.createBarChart(
+				"",         // chart title
+				"",               // domain axis label
+				"",                  // range axis label
+				dataset,                  // data
+				PlotOrientation.VERTICAL, // orientation
+				true,                     // include legend
+				false,                     // tooltips
+				false                     // URLs?
+				);
+		chart.addSubtitle(new TextTitle("COMPARISON OF YOUR BLOOD PRESSURE RECORDS THIS MONTH"));
 		
 		CategoryPlot catplot = chart.getCategoryPlot();
 		catplot.setRangeGridlinePaint(Color.BLACK);
 		catplot.setBackgroundPaint(Color.WHITE);
 		
-		ChartPanel chartPanel = new ChartPanel(chart);
-		chartPanel.setForeground(Color.GRAY);
-		chartPanel.setBorder(null);
-		chartPanel.setBackground(Color.YELLOW);
+		BarRenderer renderer = (BarRenderer) catplot.getRenderer();
+		renderer.setSeriesPaint(0, Color.BLUE);
+		renderer.setSeriesPaint(1, Color.RED);
+		renderer.setSeriesPaint(2, Color.YELLOW);
+		renderer.setSeriesPaint(3, Color.CYAN);
+		renderer.setOutlinePaint(Color.BLACK);
+		renderer.setDrawBarOutline(true);
 		
-		LineAndShapeRenderer renderer = (LineAndShapeRenderer) catplot.getRenderer();
-		renderer.setShapesVisible(true);
-		renderer.setDrawOutlines(true);
-		renderer.setFillPaint(Color.BLACK);
-		renderer.setUseFillPaint(true);
+		ChartPanel chartPanel = new ChartPanel(chart, true);
+		chartPanel.setPreferredSize(new Dimension(500, 270));
+		chartPanel.setBackground(Color.BLUE);
 		
-		pnlBPTrends.setLayout(new java.awt.BorderLayout());
-		pnlBPTrends.add(chartPanel);
-		pnlBPTrends.validate();
-		}catch(Exception ex) {
-			System.out.println(ex);
-		}
+		pnlBPComparison.setLayout(new java.awt.BorderLayout());
+		pnlBPComparison.add(chartPanel);
+		pnlBPComparison.validate();
+		
 	}
 }

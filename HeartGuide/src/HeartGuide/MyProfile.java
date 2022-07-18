@@ -67,7 +67,7 @@ public class MyProfile extends JFrame {
 	public MyProfile() {
 		setType(Type.UTILITY);
 		setTitle("My Profile");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 506, 597);
 		contentPane = new JPanel();
 		contentPane.setBorder(new EmptyBorder(0, 0, 0, 0));

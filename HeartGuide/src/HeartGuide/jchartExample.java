@@ -74,7 +74,7 @@ public class jchartExample extends JFrame {
 		dataset.setValue(65, "", "April");
 		dataset.setValue(60, "", "June");
 		
-		JFreeChart chart = ChartFactory.createLineChart("", "", "", dataset, PlotOrientation.VERTICAL, false, false, false);
+		JFreeChart chart = ChartFactory.createBarChart("", "", "", dataset, PlotOrientation.VERTICAL, false, false, false);
 		chart.addSubtitle(new TextTitle("YOUR AVERAGE WEEKLY BLOOD PRESSURE THIS MONTH"));
 		
 		

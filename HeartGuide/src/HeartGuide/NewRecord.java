@@ -54,7 +54,7 @@ public class NewRecord extends JFrame {
 	public NewRecord() {
 		setType(Type.UTILITY);
 		setTitle("New Record");
-		setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		setBounds(100, 100, 460, 349);
 		contentPane = new JPanel();
 		contentPane.setVerifyInputWhenFocusTarget(false);

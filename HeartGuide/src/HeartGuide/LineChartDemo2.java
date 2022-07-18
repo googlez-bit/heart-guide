@@ -54,7 +54,6 @@ public class LineChartDemo2 extends ApplicationFrame {
 		}
 	
 	private static JFreeChart createChart(XYDataset dataset) {
-		// create the chart...
 		JFreeChart chart = ChartFactory.createXYLineChart(
 				"Line Chart Demo 2",      // chart title
 				"Values",                      // x axis label
@@ -65,9 +64,7 @@ public class LineChartDemo2 extends ApplicationFrame {
 				true,                     // tooltips
 				false                     // urls
 				);
-		// NOW DO SOME OPTIONAL CUSTOMISATION OF THE CHART...
 		chart.setBackgroundPaint(Color.white);
-		// get a reference to the plot for further customisation...
 		XYPlot plot = (XYPlot) chart.getPlot();
 		plot.setBackgroundPaint(Color.lightGray);
 		plot.setAxisOffset(new RectangleInsets(5.0, 5.0, 5.0, 5.0));
@@ -76,11 +73,8 @@ public class LineChartDemo2 extends ApplicationFrame {
 		XYLineAndShapeRenderer renderer= (XYLineAndShapeRenderer) plot.getRenderer();
 		renderer.setShapesVisible(true);
 		renderer.setShapesFilled(true);
-		
-		// change the auto tick unit selection to integer units only...
 		NumberAxis rangeAxis = (NumberAxis) plot.getRangeAxis();
 		rangeAxis.setStandardTickUnits(NumberAxis.createIntegerTickUnits());
-		// OPTIONAL CUSTOMISATION COMPLETED.
 		return chart;
 		}
 	
