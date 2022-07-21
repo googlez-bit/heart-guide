@@ -14,12 +14,16 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import javax.swing.JTextField;
@@ -35,6 +39,8 @@ import com.toedter.calendar.JDateChooser;
 import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.Cursor;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 
 public class Register extends JFrame implements ActionListener{
 
@@ -51,6 +57,7 @@ public class Register extends JFrame implements ActionListener{
 	private JButton btnRegister;
 	private JLabel lblCreateAccount;
 	private JButton btnCancel;
+	private boolean isUsernameValid;
 
 	/**
 	 * Launch the application.
@@ -146,7 +153,11 @@ public class Register extends JFrame implements ActionListener{
         lblBirthdate.setFont(new Font("Tahoma", Font.PLAIN, 14));
         contentPane.add(lblBirthdate);
         
+        
+        
+        
         txtBirthdate = new JDateChooser();
+        txtBirthdate.setDateFormatString("MMMMM d, yyyy");
         txtBirthdate.setBounds(31, 266, 215, 26);
         txtBirthdate.setFont(new Font("Tahoma", Font.PLAIN, 14));
         txtBirthdate.getCalendarButton().setOpaque(false);
@@ -156,6 +167,9 @@ public class Register extends JFrame implements ActionListener{
         txtBirthdate.getCalendarButton().setFont(new Font("Tahoma", Font.PLAIN, 14));
         txtBirthdate.setFocusable(false);
         txtBirthdate.setBorder(new LineBorder(new Color(0, 0, 0)));
+        java.util.Date date = new java.util.Date();
+        txtBirthdate.setDate(date);
+        
         contentPane.add(txtBirthdate);
         
         JLabel lblAddress = new JLabel("Address");
@@ -219,6 +233,26 @@ public class Register extends JFrame implements ActionListener{
         contentPane.add(lblPassword);
         
         txtPassword = new JPasswordField();
+        txtPassword.addFocusListener(new FocusAdapter() {
+        	@Override
+        	public void focusGained(FocusEvent e) {
+        		if(txtPassword.getText().equals("") || (txtPassword.getText().equals("Password")))
+        		{
+        			txtPassword.setText("");
+        			txtPassword.setEchoChar('•');
+        		}
+        		
+        	}
+        	@Override
+        	public void focusLost(FocusEvent e) {
+        		if(txtPassword.getText().equals("") || (txtPassword.getText().equals("Password")))
+        		{
+        			txtPassword.setText("Password");
+        			txtPassword.setEchoChar((char)0);
+        		}
+        	}
+        });
+        txtPassword.setEchoChar((char)0);
         txtPassword.setBounds(247, 493, 209, 26);
         txtPassword.setText("Password");
         txtPassword.setFont(new Font("Tahoma", Font.PLAIN, 14));
@@ -266,53 +300,113 @@ public class Register extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == btnRegister){
-			double height = Double.valueOf(txtHeight.getText());
-			double weight = Double.valueOf(txtWeight.getText());
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
-			String bdate =sdf.format(txtBirthdate.getDate());
-			String password = new String(txtPassword.getPassword());
+			
 			try {
-	            Connection con = getConnection();
-	            PreparedStatement insert = con.prepareStatement("INSERT INTO user_info (user_first, user_middle, user_last, user_address, user_height, user_weight, user_birthdate) VALUES (?,?,?, ?,?,?,?)");
-	            insert.setString(1, txtFirst.getText());
-	            insert.setString(2, txtMiddle.getText());
-	            insert.setString(3, txtLast.getText());
-	            insert.setString(4, txtAddress.getText());
-	            insert.setDouble(5, height);
-	            insert.setDouble(6, weight);
-	            insert.setString(7, bdate);
-	            insert.executeUpdate();
-	            PreparedStatement select = con.prepareStatement("Select MAX(user_id) from user_info");
-	            ResultSet rs= select.executeQuery();
-	            String uid = null;
-	            while(rs.next()) {
-	            uid=rs.getString("MAX(user_id)");
-	            }
-	            PreparedStatement insert2 = con.prepareStatement("INSERT INTO user_account (user_id, username, password) VALUES (?,?, ?)");
-	            insert2.setString(1, uid);
-	            insert2.setString(2, txtUsername.getText());
-	            insert2.setString(3, password );
-	            insert2.executeUpdate();
-	            
-	        } catch (Exception ex) {
-	            ex.printStackTrace();
-	        }
+				double height = Double.valueOf(txtHeight.getText());
+				double weight = Double.valueOf(txtWeight.getText());
+				SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+				String bdate =sdf.format(txtBirthdate.getDate());
+				String password = new String(txtPassword.getPassword());
+				Integer.parseInt(txtHeight.getText());
+				
+				try {
+					if(txtFirst.getText().equals("") || txtMiddle.getText().equals("") || txtLast.getText().equals("") || txtAddress.getText().equals("") || txtHeight.getText().equals("") || txtWeight.getText().equals("") || txtUsername.getText().equals("") || txtPassword.getText().equals(""))
+					{
+						JOptionPane.showInternalMessageDialog(null, "Error! Please fill all fields.", "Error!", JOptionPane.ERROR_MESSAGE);
+					}else
+					{
+						checkUsername();
+						if(isUsernameValid == true)
+						{
+							Connection con = getConnection();
+				            PreparedStatement insert = con.prepareStatement("INSERT INTO user_info (user_first, user_middle, user_last, user_address, user_height, user_weight, user_birthdate) VALUES (?,?,?, ?,?,?,?)");
+				            insert.setString(1, txtFirst.getText());
+				            insert.setString(2, txtMiddle.getText());
+				            insert.setString(3, txtLast.getText());
+				            insert.setString(4, txtAddress.getText());
+				            insert.setDouble(5, height);
+				            insert.setDouble(6, weight);
+				            insert.setString(7, bdate);
+				            insert.executeUpdate();
+				            PreparedStatement select = con.prepareStatement("Select MAX(user_id) from user_info");
+				            ResultSet rs= select.executeQuery();
+				            String uid = null;
+				            while(rs.next()) {
+				            uid=rs.getString("MAX(user_id)");
+				            }
+				            PreparedStatement insert2 = con.prepareStatement("INSERT INTO user_account (user_id, username, password) VALUES (?,?, ?)");
+				            insert2.setString(1, uid);
+				            insert2.setString(2, txtUsername.getText());
+				            insert2.setString(3, password );
+				            insert2.executeUpdate();
+				            
+				            JOptionPane.showMessageDialog(this, "Registration Success!", "Information!" ,JOptionPane.INFORMATION_MESSAGE);
+				            txtAddress.setText("");
+				            txtFirst.setText("");
+				            txtHeight.setText("");
+				            txtLast.setText("");
+				            txtMiddle.setText("");
+				            txtPassword.setText("Password");
+				            txtPassword.setEchoChar((char)0);
+				            txtUsername.setText("");
+				            txtWeight.setText("");
+						}
+					}
+		            
+		        } catch (Exception ex) {
+		        	ex.printStackTrace();
+		        }
+			}catch(NumberFormatException ex)
+			{
+				JOptionPane.showMessageDialog(this, "Please check if the inputted value is valid.", "Error!", JOptionPane.ERROR_MESSAGE);
+			}
+			
 		}else if(e.getSource()== btnCancel ) {
 			
 			
 		}else {
 		
 		}
-		
 	}
+	
+	public void checkUsername()
+	{
+		String userCheck = txtUsername.getText();
+		try {
+		      Class.forName("com.mysql.cj.jdbc.Driver");
+		      Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","");
+		      String query = "SELECT username FROM user_account";
+		      Statement st = conn.createStatement();
+		      ResultSet rs = st.executeQuery(query);
+		      while (rs.next())
+		      {
+		    	  System.out.println(rs.getString("username"));
+		    	if(rs.getString("username").equals(userCheck))
+		    	{
+		    		JOptionPane.showMessageDialog(null, "Sorry, this username is already taken.", "Error!", JOptionPane.ERROR_MESSAGE);
+		    		isUsernameValid = false;
+		    		txtUsername.requestFocus();
+		    		System.out.println(rs.getString("username"));
+		    		break;
+		    	}else
+		    	{
+		    		System.out.println("From else" + rs.getString("username"));
+		    		isUsernameValid = true;
+		    	}
+		      }
+		}catch(Exception e)
+		{
+			e.printStackTrace();
+		}
+	}
+	
 	public static Connection getConnection() throws Exception{
 		   try {
-	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","falculan1234");//change password     
+	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","");//change password     
 	            Class.forName("com.mysql.cj.jdbc.Driver");
 	            return con;      
 	        } catch (Exception ex) {
 	            ex.printStackTrace();
 	        }return null;
-		   
 	   }
 }

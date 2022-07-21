@@ -33,7 +33,7 @@ public class DBConnection {
 	   public static void createDB(){
 		   String userQuery = "CREATE DATABASE IF NOT EXISTS heart_guide";
 		   try {
-	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","falculan1234");//change password
+	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/","root","");//change password
 	            Statement stmt = con.createStatement();
 	            Class.forName("com.mysql.cj.jdbc.Driver");
 	            stmt.executeUpdate(userQuery);
@@ -46,7 +46,7 @@ public class DBConnection {
 	   }
 	   public static Connection getConnection() throws Exception{
 		   try {
-	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","falculan1234");//change password
+	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","");//change password
 	            Class.forName("com.mysql.cj.jdbc.Driver");
 	            System.out.println("Success!");
 	            return con;
