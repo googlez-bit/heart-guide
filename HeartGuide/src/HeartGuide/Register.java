@@ -268,9 +268,10 @@ public class Register extends JFrame implements ActionListener{
 		if(e.getSource() == btnRegister){
 			double height = Double.valueOf(txtHeight.getText());
 			double weight = Double.valueOf(txtWeight.getText());
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
 			String bdate =sdf.format(txtBirthdate.getDate());
 			String password = new String(txtPassword.getPassword());
+			System.out.println(bdate);
 			try {
 	            Connection con = getConnection();
 	            PreparedStatement insert = con.prepareStatement("INSERT INTO user_info (user_first, user_middle, user_last, user_address, user_height, user_weight, user_birthdate) VALUES (?,?,?, ?,?,?,?)");

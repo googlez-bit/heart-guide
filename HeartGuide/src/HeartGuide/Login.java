@@ -2,11 +2,18 @@ package HeartGuide;
 
 import java.awt.EventQueue;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 import java.awt.image.BufferedImage;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.text.SimpleDateFormat;
 import java.awt.Color;
 import javax.swing.JLabel;
 import javax.imageio.ImageIO;
@@ -25,13 +32,14 @@ import javax.swing.JCheckBox;
 import javax.swing.JPasswordField;
 import java.awt.Cursor;
 
-public class Login extends JFrame {
+public class Login extends JFrame implements ActionListener {
 
 	private JPanel contentPane;
 	private JLabel lblIcon;
 	private JTextField txtUsername;
 	private JLabel lblSignIn;
 	private JPasswordField txtPassword;
+	private JButton btnLogin;
 
 	/**
 	 * Launch the application.
@@ -98,7 +106,7 @@ public class Login extends JFrame {
         txtPassword.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         contentPane.add(txtPassword);
          
-        JButton btnLogin = new JButton("Login");
+        btnLogin = new JButton("Login");
         btnLogin.setBounds(231, 260, 110, 26);
         btnLogin.setFont(new Font("Tahoma", Font.PLAIN, 14));
         btnLogin.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
@@ -106,6 +114,7 @@ public class Login extends JFrame {
         btnLogin.setBackground(new Color(210, 104, 110));
         btnLogin.setFocusPainted(false);
         btnLogin.setBorder(null);
+        btnLogin.addActionListener(this);
         contentPane.add(btnLogin);
          
         JCheckBox chckbxRemember = new JCheckBox("Remember me");
@@ -144,4 +153,49 @@ public class Login extends JFrame {
 		
 		this.setLocationRelativeTo(null);
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		// TODO Auto-generated method stub
+		String password = new String(txtPassword.getPassword());
+		String username = txtUsername.getText();
+		System.out.println( username + " " + password);
+		if(e.getSource() == btnLogin){
+			try {
+	            Connection con = getConnection();
+	            PreparedStatement select = con.prepareStatement("Select username from user_account where username = ? and password = ?");
+	            select.setString(1, username);
+	            select.setString(2, password);
+	            ResultSet rs= select.executeQuery();
+	            String cnt = null;
+	            
+	            System.out.println(cnt);
+	            if(username == "admin") {
+	            	System.out.println("Login Successfull");
+	            	
+	            }
+	            
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+			
+	            
+	       
+		}else if(e.getSource()== null ) {
+			
+			
+		}else {
+		
+		}
+	}
+	public static Connection getConnection() throws Exception{
+		   try {
+	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","falculan1234");//change password     
+	            Class.forName("com.mysql.cj.jdbc.Driver");
+	            return con;      
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }return null;
+		   
+	   }
 }
