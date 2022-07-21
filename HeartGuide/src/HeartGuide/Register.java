@@ -1,10 +1,20 @@
 package HeartGuide;
 
 import java.awt.Component;
+
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.sql.Connection;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.text.SimpleDateFormat;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -26,17 +36,21 @@ import javax.swing.JPasswordField;
 import javax.swing.JButton;
 import java.awt.Cursor;
 
-public class Register extends JFrame {
+public class Register extends JFrame implements ActionListener{
 
 	private JPanel contentPane;
 	private JTextField txtFirst;
 	private JTextField txtMiddle;
-	private JTextField textField;
+	private JTextField txtLast;
 	private JTextField txtAddress;
 	private JTextField txtHeight;
 	private JTextField txtWeight;
 	private JTextField txtUsername;
 	private JPasswordField txtPassword;
+	private JDateChooser txtBirthdate;
+	private JButton btnRegister;
+	private JLabel lblCreateAccount;
+	private JButton btnCancel;
 
 	/**
 	 * Launch the application.
@@ -121,18 +135,18 @@ public class Register extends JFrame {
         lblLast.setFont(new Font("Tahoma", Font.PLAIN, 14));
         contentPane.add(lblLast);
         
-        textField = new JTextField();
-        textField.setBounds(327, 204, 135, 26);
-        textField.setFont(new Font("Tahoma", Font.PLAIN, 14));
-        textField.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
-        contentPane.add(textField);
+        txtLast = new JTextField();
+        txtLast.setBounds(327, 204, 135, 26);
+        txtLast.setFont(new Font("Tahoma", Font.PLAIN, 14));
+        txtLast.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
+        contentPane.add(txtLast);
         
         JLabel lblBirthdate = new JLabel("Birthdate");
         lblBirthdate.setBounds(31, 241, 55, 14);
         lblBirthdate.setFont(new Font("Tahoma", Font.PLAIN, 14));
         contentPane.add(lblBirthdate);
         
-        JDateChooser txtBirthdate = new JDateChooser();
+        txtBirthdate = new JDateChooser();
         txtBirthdate.setBounds(31, 266, 215, 26);
         txtBirthdate.setFont(new Font("Tahoma", Font.PLAIN, 14));
         txtBirthdate.getCalendarButton().setOpaque(false);
@@ -211,7 +225,7 @@ public class Register extends JFrame {
         txtPassword.setBorder(BorderFactory.createCompoundBorder(new LineBorder(Color.BLACK), BorderFactory.createEmptyBorder(5, 5, 5, 5)));
         contentPane.add(txtPassword);
         
-        JButton btnCancel = new JButton("Cancel");
+        btnCancel = new JButton("Cancel");
         btnCancel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnCancel.setBounds(128, 542, 106, 26);
         btnCancel.setForeground(Color.WHITE);
@@ -221,7 +235,7 @@ public class Register extends JFrame {
         btnCancel.setBackground(Color.LIGHT_GRAY);
         contentPane.add(btnCancel);
         
-        JButton btnRegister = new JButton("Register");
+        btnRegister = new JButton("Register");
         btnRegister.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnRegister.setBounds(245, 542, 110, 26);
         btnRegister.setForeground(Color.WHITE);
@@ -229,6 +243,7 @@ public class Register extends JFrame {
         btnRegister.setFocusPainted(false);
         btnRegister.setBorder(null);
         btnRegister.setBackground(new Color(210, 104, 110));
+        btnRegister.addActionListener(this);
         contentPane.add(btnRegister);
         
         JLabel lblHaveHG = new JLabel("An existing user?");
@@ -237,7 +252,7 @@ public class Register extends JFrame {
         lblHaveHG.setFont(new Font("Tahoma", Font.PLAIN, 13));
         contentPane.add(lblHaveHG);
         
-        JLabel lblCreateAccount = new JLabel("Sign in to your account!");
+        lblCreateAccount = new JLabel("Sign in to your account!");
         lblCreateAccount.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         lblCreateAccount.setBounds(231, 571, 135, 25);
         lblCreateAccount.setForeground(new Color(210, 104, 110));
@@ -247,4 +262,57 @@ public class Register extends JFrame {
 		
 		this.setLocationRelativeTo(null);
 	}
+
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		if(e.getSource() == btnRegister){
+			double height = Double.valueOf(txtHeight.getText());
+			double weight = Double.valueOf(txtWeight.getText());
+			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-mm-dd");
+			String bdate =sdf.format(txtBirthdate.getDate());
+			String password = new String(txtPassword.getPassword());
+			try {
+	            Connection con = getConnection();
+	            PreparedStatement insert = con.prepareStatement("INSERT INTO user_info (user_first, user_middle, user_last, user_address, user_height, user_weight, user_birthdate) VALUES (?,?,?, ?,?,?,?)");
+	            insert.setString(1, txtFirst.getText());
+	            insert.setString(2, txtMiddle.getText());
+	            insert.setString(3, txtLast.getText());
+	            insert.setString(4, txtAddress.getText());
+	            insert.setDouble(5, height);
+	            insert.setDouble(6, weight);
+	            insert.setString(7, bdate);
+	            insert.executeUpdate();
+	            PreparedStatement select = con.prepareStatement("Select MAX(user_id) from user_info");
+	            ResultSet rs= select.executeQuery();
+	            String uid = null;
+	            while(rs.next()) {
+	            uid=rs.getString("MAX(user_id)");
+	            }
+	            PreparedStatement insert2 = con.prepareStatement("INSERT INTO user_account (user_id, username, password) VALUES (?,?, ?)");
+	            insert2.setString(1, uid);
+	            insert2.setString(2, txtUsername.getText());
+	            insert2.setString(3, password );
+	            insert2.executeUpdate();
+	            
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }
+		}else if(e.getSource()== btnCancel ) {
+			
+			
+		}else {
+		
+		}
+		
+	}
+	public static Connection getConnection() throws Exception{
+		   try {
+	            Connection con = DriverManager.getConnection("jdbc:mysql://localhost:3306/heart_guide","root","falculan1234");//change password     
+	            Class.forName("com.mysql.cj.jdbc.Driver");
+	            return con;      
+	        } catch (Exception ex) {
+	            ex.printStackTrace();
+	        }return null;
+		   
+	   }
 }
