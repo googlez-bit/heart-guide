@@ -300,16 +300,6 @@ public class Register extends JFrame implements ActionListener{
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		if(e.getSource() == btnRegister){
-<<<<<<< HEAD
-			double height = Double.valueOf(txtHeight.getText());
-			double weight = Double.valueOf(txtWeight.getText());
-			SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
-			String bdate =sdf.format(txtBirthdate.getDate());
-			String password = new String(txtPassword.getPassword());
-			System.out.println(bdate);
-=======
-			
->>>>>>> branch 'master' of https://github.com/googlez-bit/heart-guide.git
 			try {
 				double height = Double.valueOf(txtHeight.getText());
 				double weight = Double.valueOf(txtWeight.getText());
